@@ -7,12 +7,11 @@ FROM php:8.1-apache
 # Install PHP extensions needed for MySQL
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Fix Apache MPM conflict
-RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
-    && a2enmod mpm_prefork
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Fix Apache MPM conflict - disable all then enable prefork only
+RUN apt-get update && apt-get install -y libapache2-mod-php8.1 2>/dev/null || true \
+    && a2dismod mpm_event mpm_worker mpm_prefork 2>/dev/null || true \
+    && a2enmod mpm_prefork \
+    && a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www/html
