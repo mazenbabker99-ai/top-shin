@@ -7,10 +7,11 @@ FROM php:8.1-apache
 # Install PHP extensions needed for MySQL
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Fix Apache MPM conflict - disable all then enable prefork only
-RUN apt-get update && apt-get install -y libapache2-mod-php8.1 2>/dev/null || true \
-    && a2dismod mpm_event mpm_worker mpm_prefork 2>/dev/null || true \
-    && a2enmod mpm_prefork \
+# Fix MPM conflict completely
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+          /etc/apache2/mods-enabled/mpm_*.conf \
+    && ln -s /etc/apache2/mods-available/mpm_prefork.load \
+             /etc/apache2/mods-enabled/mpm_prefork.load \
     && a2enmod rewrite
 
 # Set working directory
@@ -25,7 +26,7 @@ RUN mkdir -p /var/www/html/assets/images/products \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 /var/www/html/assets
 
-# Apache config to allow .htaccess overrides
+# Apache config
 RUN echo '<Directory /var/www/html>\n\
     Options Indexes FollowSymLinks\n\
     AllowOverride All\n\
