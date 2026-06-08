@@ -7,6 +7,10 @@ FROM php:8.1-apache
 # Install PHP extensions needed for MySQL
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
+# Fix Apache MPM conflict
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork
+
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
@@ -16,7 +20,7 @@ WORKDIR /var/www/html
 # Copy all project files
 COPY . /var/www/html/
 
-# Set correct permissions (mkdir assets in case it doesn't exist)
+# Set correct permissions
 RUN mkdir -p /var/www/html/assets/images/products \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
@@ -30,7 +34,6 @@ RUN echo '<Directory /var/www/html>\n\
 </Directory>' > /etc/apache2/conf-available/topshine.conf \
     && a2enconf topshine
 
-# Railway assigns the PORT dynamically
 ENV PORT=80
 EXPOSE 80
 
