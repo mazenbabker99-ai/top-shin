@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "nodeVersion": "20",
+  "buildCommand": "",
+  "startCommand": "apache2-foreground",
+  "restartPolicyType": "always",
+  "restartPolicyMaxRetries": 5
+}
