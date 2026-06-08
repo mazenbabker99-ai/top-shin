@@ -1,4 +1,4 @@
-<?php
+s<?php
 // ============================================================
 // المسار: config/database.php
 // الوظيفة: اتصال قاعدة البيانات — Singleton Pattern مع PDO
@@ -7,13 +7,13 @@
 declare(strict_types=1);
 
 // ——— إعدادات الاتصال ———
-// عدّلها قبل الرفع على الخادم
-define('DB_HOST',    'localhost');
-define('DB_NAME',    'topshine_db');
-define('DB_USER',    'root');
-define('DB_PASS',    '');
+// تقرأ تلقائياً من متغيرات Railway — لا تعدّل هذه الأسطر
+define('DB_HOST',    getenv('MYSQLHOST')     ?: 'localhost');
+define('DB_NAME',    getenv('MYSQLDATABASE') ?: 'topshine_db');
+define('DB_USER',    getenv('MYSQLUSER')     ?: 'root');
+define('DB_PASS',    getenv('MYSQLPASSWORD') ?: '');
 define('DB_CHARSET', 'utf8mb4');
-define('DB_PORT',    '3306');
+define('DB_PORT',    getenv('MYSQLPORT')     ?: '3306');
 
 // ============================================================
 // class Database — Singleton
