@@ -4,14 +4,15 @@
 
 FROM php:8.1-apache
 
-# Disable all MPM modules first
-RUN a2dismod mpm_event mpm_worker mpm_prefork 2>/dev/null || true
-
 # Install PHP extensions needed for MySQL
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Enable prefork MPM
-RUN a2enmod mpm_prefork rewrite
+# Copy custom entrypoint to fix MPM conflicts at container start
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Enable rewrite (prefork will be ensured by entrypoint)
+RUN a2enmod rewrite || true
 
 # Set working directory
 WORKDIR /var/www/html
@@ -36,4 +37,5 @@ RUN echo '<Directory /var/www/html>\n\
 ENV PORT=80
 EXPOSE 80
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
