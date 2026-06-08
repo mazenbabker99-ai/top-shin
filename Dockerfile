@@ -4,15 +4,14 @@
 
 FROM php:8.1-apache
 
+# Disable all MPM modules first
+RUN a2dismod mpm_event mpm_worker mpm_prefork 2>/dev/null || true
+
 # Install PHP extensions needed for MySQL
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Fix MPM conflict completely
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-          /etc/apache2/mods-enabled/mpm_*.conf \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.load \
-             /etc/apache2/mods-enabled/mpm_prefork.load \
-    && a2enmod rewrite
+# Enable prefork MPM
+RUN a2enmod mpm_prefork rewrite
 
 # Set working directory
 WORKDIR /var/www/html
